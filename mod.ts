@@ -1,5 +1,5 @@
-import { ShaclProperty } from 'https://deno.land/x/shacl_meta@0.2/types.ts'
-import { Parser } from 'https://deno.land/x/shacl_meta@0.2/mod.ts'
+import { ParserOutput, ShaclProperty } from 'https://deno.land/x/shacl_meta@0.3/types.ts'
+import { Parser } from 'https://deno.land/x/shacl_meta@0.3/mod.ts'
 import { ContextParser, JsonLdContextNormalized } from 'npm:jsonld-context-parser'
 
 export class Converter {
@@ -24,13 +24,13 @@ export class Converter {
     /**
      * Converts the metas to TypeScript types.
      */
-    stringify (shapeMetas: { [key: string]: Array<ShaclProperty> }, context: JsonLdContextNormalized) {
+    stringify (shapeMetas: ParserOutput, context: JsonLdContextNormalized) {
         const types: Array<{ text: string, iri: string, name: string }> = []
 
         for (const [iri, shapeMeta] of Object.entries(shapeMetas)) {
             let typeString = ''
 
-            for (const shapeProperty of shapeMeta) {
+            for (const shapeProperty of shapeMeta.properties) {
                 typeString += '\n' + this.processPropery(shapeProperty, context)
             }
 
@@ -53,7 +53,14 @@ export class Converter {
         const compactedIri = context.compactIri(iri, true)
         return compactedIri.replaceAll(':', '')
     }
-
+    
+    rdfToJsType = (iri: string) => {
+        if (iri === 'http://www.w3.org/2001/XMLSchema#date') return 'Date'
+        if (iri === 'http://www.w3.org/2001/XMLSchema#integer') return 'number'
+        if (iri === 'http://www.w3.org/2001/XMLSchema#string') return 'string'
+        if (iri === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString') return 'string'
+    }
+    
     /**
      * Processes one shacl property.
      */
@@ -65,7 +72,9 @@ export class Converter {
         const nodeType = shaclPropery.nodeType as string ?? null
         const nodeTypeCompacted = nodeType ? this.createTypeName(nodeType, context) : null
 
-        const strictType = nodeTypeCompacted ? nodeTypeCompacted : 'string'
+        const dataType = shaclPropery.dataType ? this.rdfToJsType(shaclPropery.dataType as string) : null
+
+        const strictType = nodeTypeCompacted ? nodeTypeCompacted : (dataType ?? 'string')
 
         let type = `${multiple ? 'Array<' : ''}${strictType}${multiple ? '>' : ''}`
 
@@ -76,7 +85,8 @@ export class Converter {
         if (shaclPropery.or) {
             const nestedProperties = shaclPropery.or as unknown as Array<any>
             // We do not allow nested sh:or
-            const nestedTypes: Array<string> = nestedProperties.map(nestedProperty => this.processPropery(nestedProperty, context, indent, true)) as Array<string>
+            const nestedTypes: Array<string> = nestedProperties
+                .map(nestedProperty => this.processPropery(nestedProperty, context, indent, true)) as Array<string>
             const nestedTypesSet = new Set(nestedTypes)
             type = [...nestedTypesSet.values()].join(' | ')
         }

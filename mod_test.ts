@@ -2,16 +2,16 @@ import { Converter } from './mod.ts'
 import { assertEquals } from 'https://deno.land/std@0.168.0/testing/asserts.ts'
 
 const expectedType1 = `export type selfPhilosopher = {
-  label?: Array<string>;
+  label?: string | Array<string>;
   thumb: string;
   type: string;
   birthPlace?: Array<selfLocation>;
-  birthDate?: Array<string>;
+  birthDate?: Date;
 }
 `
 
 Deno.test('Output of transform', async () => {
-    const response = await fetch('https://deno.land/x/shacl_meta@0.2/shapes/Person.ttl')
+    const response = await fetch('https://deno.land/x/shacl_meta@0.3/shapes/Person.ttl')
     const personShacl = await response.text()
     
     const converter = new Converter()
