@@ -32,4 +32,9 @@ export type selfPhilosopher = {
   birthDate?: Date;
 }
 
+export type selfLocation = {
+  type: string;
+  name: string;
+}
+
 ```

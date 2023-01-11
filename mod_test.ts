@@ -24,5 +24,7 @@ Deno.test('Output of transform', async () => {
     
     const typeScriptTypes = await converter.transform(personShacl, 'dbp', context)
 
+    console.log(typeScriptTypes[1].text)
+
     assertEquals(typeScriptTypes[0].text, expectedType1)
 })
