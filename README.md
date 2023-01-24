@@ -7,7 +7,7 @@ You also need to give an @vocab ontology alias.
 ## Usage
 
 ```TypeScript
-import { Converter } from 'https://deno.land/x/shacl_meta_type@0.2/mod.ts'
+import { Converter } from 'https://deno.land/x/shacl_meta_type@0.3/mod.ts'
 // NPM module will be created when this all is more stable and finished.
 
 const response = await fetch('https://deno.land/x/shacl_meta@0.3/shapes/Person.ttl')
