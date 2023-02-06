@@ -1,5 +1,5 @@
-import { ParserOutput, ShaclProperty } from 'https://deno.land/x/shacl_meta@0.3/types.ts'
-import { Parser } from 'https://deno.land/x/shacl_meta@0.3/mod.ts'
+import { ParserOutput, ShaclProperty } from 'https://deno.land/x/shacl_meta@0.4/types.ts'
+import { Parser } from 'https://deno.land/x/shacl_meta@0.4/mod.ts'
 import { ContextParser, JsonLdContextNormalized } from 'npm:jsonld-context-parser'
 
 export class Converter {
